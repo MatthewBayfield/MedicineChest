@@ -80,5 +80,15 @@
                 i++;
             }
         }
+
+        private bool CanAllCallersBoard(int spacesAvailable)
+        {
+            // Getting the list of callers wanting to board the lift.
+            IEnumerable<int> boardingCallers =
+                    from caller in liftCallers
+                    where Program.liftCallsDict[caller][0] == CurrentFloor
+                    select caller;
+            return (boardingCallers.ToList().Count > spacesAvailable);
+        }
     } 
 }
