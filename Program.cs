@@ -171,5 +171,10 @@ namespace MedicineChest
                 }
             }
         }
+
+        public static void WriteToOutputCSV()
+        {
+
+        }
     }
 }
