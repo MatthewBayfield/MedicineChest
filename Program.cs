@@ -11,6 +11,8 @@ namespace MedicineChest
         public static List<List<int>> liftCallsList = new();
         public static Dictionary<int, List<int>> liftCallsDict = new();
         private static Lift lift = new();
+        private static Dictionary<int, List<int>> CallerJourneyDetails = new();
+        private static List<List<object>> LiftJourneyDetails = new();
 
         static void Main(string[] args)
         {
@@ -23,27 +25,30 @@ namespace MedicineChest
             timer.Start();
             Console.Clear();
             Console.WriteLine("Lift now operational, timer started.");
-            while (time < LastCallTime | lift.selectedFloorsLive.Count != 0 | lift.calledFloorsLive.Count != 0)
-            {
-
-            }
         }
 
         public static void UpdateTime(Object? sender, ElapsedEventArgs e)
         {
             time += 1;
-            List<int> floorsToBeCalled = new();
+            List<int> newCallers = new();
             IEnumerable<List<int>> timeMatches =
                 from liftCall in liftCallsList
                 where liftCall[3] == time
                 select liftCall;
             foreach ( List<int> liftCall in timeMatches )
             {
-                floorsToBeCalled.Add(liftCall[0]);
+                newCallers.Add(liftCall[0]);
             }
-            if (floorsToBeCalled.Count != 0)
+            if (newCallers.Count != 0)
             {
-                lift.UpdateCalledFloors(floorsToBeCalled);
+                lift.UpdateCalledFloors(newCallers);
+            }
+            // Ends program once all lift calls have occured and the lift is once again empty.
+            if (time > LastCallTime & lift.selectedFloorsLive.Count == 0 & lift.calledFloorsLive.Count == 0)
+            {
+                timer.Stop();
+                // add code here for writing total time to CSV
+                Environment.Exit(0);
             }
 
         }
