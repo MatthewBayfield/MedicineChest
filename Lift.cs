@@ -53,5 +53,32 @@
             departingRiders.ToList().ForEach((int riderID) => Console.WriteLine("Rider with callerID = {0}, departing at current floor = {1}, at t = {2}",
                                                                                 riderID, CurrentFloor, timeWhenStopped));
         }
+
+        private void SelectFloors(int spacesAvailable, int timeWhenStopped)
+        {
+            if (spacesAvailable == 0) return;
+            // Obtaining the ID's of callers wanting to board the lift.
+            IEnumerable<int> boardingCallers =
+                    from caller in liftCallers
+                    where Program.liftCallsDict[caller][0] == CurrentFloor
+                    select caller;
+            List<int> boardingCallersList = boardingCallers.ToList();
+
+            int i = 0;
+            int selectedFloor;
+            int boardedCallerID;
+            // Adding callers to the lift, subject to space availability
+            while (i < (new int[] { spacesAvailable, boardingCallersList.Count }).Min())
+            {
+                // Add boarded caller to lift riders and add their selected floor to the selected floors set.
+                boardedCallerID = boardingCallersList[i];
+                liftRiders.Add(boardedCallerID);
+                selectedFloor = Program.liftCallsDict[boardedCallerID][1];
+                selectedFloorsLive.Add(selectedFloor);
+                Console.WriteLine("CallerID = {0} has boarded the lift at t = {1}, and selected to go to floor {2}", boardedCallerID, timeWhenStopped, selectedFloor);
+                liftCallers.Remove(boardedCallerID);
+                i++;
+            }
+        }
     } 
 }
