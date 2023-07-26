@@ -8,19 +8,21 @@ namespace MedicineChest
         private static System.Timers.Timer timer = new(1000);
         private static int LastCallTime;
         public static string[] InputCSVHeadings = {};
-        private static List<List<int>> liftCallsList = new();
-        private static Dictionary<int, List<int>> liftCallsDict = new();
+        public static List<List<int>> liftCallsList = new();
+        public static Dictionary<int, List<int>> liftCallsDict = new();
+        private static Lift lift = new();
 
         static void Main(string[] args)
         {
             // Load user input CSV file.
             ProcessInputCSV();
             LastCallTime = liftCallsList.Last()[3];
-            // create lift object and start the timer.
-            Lift lift = new();
+            //start the timer.
             timer.AutoReset = true;
             timer.Elapsed += UpdateTime;
             timer.Start();
+            Console.Clear();
+            Console.WriteLine("Lift now operational, timer started.");
             while (time < LastCallTime | lift.selectedFloorsLive.Count != 0 | lift.calledFloorsLive.Count != 0)
             {
 
@@ -30,6 +32,20 @@ namespace MedicineChest
         public static void UpdateTime(Object? sender, ElapsedEventArgs e)
         {
             time += 1;
+            List<int> floorsToBeCalled = new();
+            IEnumerable<List<int>> timeMatches =
+                from liftCall in liftCallsList
+                where liftCall[3] == time
+                select liftCall;
+            foreach ( List<int> liftCall in timeMatches )
+            {
+                floorsToBeCalled.Add(liftCall[0]);
+            }
+            if (floorsToBeCalled.Count != 0)
+            {
+                lift.UpdateCalledFloors(floorsToBeCalled);
+            }
+
         }
 
         private static void ProcessInputCSV()
