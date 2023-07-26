@@ -146,5 +146,30 @@ namespace MedicineChest
         {
             return int.Parse(str);
         }
+
+        public static void UpdateLiftJourneyDetails(int currentFloor, int time, HashSet<int> liftRidersAfterStop, HashSet<int> liftCallersAfterStop, List<int> routeAfterStop)
+        {
+            List<object> liftRecord = new List<object>(new object[] { time, currentFloor, liftRidersAfterStop, liftCallersAfterStop, routeAfterStop });
+            LiftJourneyDetails.Add(liftRecord);
+        }
+
+        public static void UpdateCallerJourneyDetails(List<int> callerIDs, int? timeboarded = null, int? timeDisembarked = null)
+        {
+            foreach (int callerID in callerIDs)
+            {
+                if (!CallerJourneyDetails.ContainsKey(callerID))
+                {
+                    CallerJourneyDetails.Add(callerID, new List<int>());
+                }
+                if (timeboarded != null)
+                {
+                    CallerJourneyDetails[callerID].Add((int)timeboarded);
+                }
+                if (timeDisembarked != null)
+                {
+                    CallerJourneyDetails[callerID].Add((int)timeDisembarked);
+                }
+            }
+        }
     }
 }
