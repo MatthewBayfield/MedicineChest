@@ -15,6 +15,7 @@
         public int averageStopTime = 30;
         public int liftCapacity = 8;
         public int liftAdjacentFloorTravelTime = 10;
+        public List<int> route = new();
 
         public Lift()
         {
@@ -40,6 +41,74 @@
             }
         }
 
+        public async void OperateLift()
+        {
+            int timeWhenStopped = 0;
+            int spacesAvailable = liftCapacity;
+            // Main Lift Operation Loop.
+            while (true)
+            {
+                timeWhenStopped = Program.time;
+                Console.WriteLine("Lift stopped at current floor = {0}, at t = {1}.", CurrentFloor, timeWhenStopped);
+
+                // Behaviour when lift is empty and no lift calls:
+
+                if (selectedFloorsLive.Count == 0 & calledFloorsLive.Count == 0)
+                {
+                    continue;
+                }
+
+                // Behaviour when lift is not empty and or there are lift calls:
+
+                if (selectedFloorsLive.Contains(CurrentFloor) | calledFloorsLive.Contains(CurrentFloor))
+                {
+                    Console.WriteLine("Opening lift doors.");
+                    Console.WriteLine("Waiting average stop time = {0}", averageStopTime);
+                    // Removing current floor from the selected floor sets.
+                    selectedFloorsLive.Remove(CurrentFloor);
+                    selectedFloorsSnapshot.Remove(CurrentFloor);
+                    // Resetting counter for current floor in selectedFloorCounters.
+                    selectedFloorCounters[$"x_{CurrentFloor}"] = 0;
+                    // Disembarking any relevant riders at current stop.
+                    DisembarkRiders(timeWhenStopped);
+
+                    spacesAvailable = liftCapacity - liftRiders.Count;
+                    // In this prototype test it is possible to track the number of users in the lift, and this will be used instead of changes in the lift weight.
+                    if (liftRiders.Count == liftCapacity)
+                    {
+                        liftFull = true;
+                    }
+
+                    else if (CanAllCallersBoard(spacesAvailable))
+                    {
+                        liftFull = true;
+                    }
+                    else
+                    {
+                        liftFull = false;
+                        // Removing current floor from the called floor sets.
+                        calledFloorsLive.Remove(CurrentFloor);
+                        calledFloorsSnapshot.Remove(CurrentFloor);
+                        // Resetting counter for current floor in calledFloorCounters.
+                        calledFloorCounters[$"x_{CurrentFloor}"] = 0;
+                    }
+
+                    // Add selected floors for any new riders that boarded.
+                    SelectFloors(spacesAvailable, timeWhenStopped);
+
+                    // Updating counters for remaining selected and called floors
+                    foreach (int floor in selectedFloorsSnapshot)
+                    {
+                        selectedFloorCounters[$"x_{floor}"] += 1;
+                    }
+                    foreach (int floor in calledFloorsSnapshot)
+                    {
+                        calledFloorCounters[$"x_{floor}"] += 1;
+                    }
+                }
+            }
+        }
+
         private void DisembarkRiders(int timeWhenStopped)
         {
             // adding Output CSV entries for departing riders
@@ -47,7 +116,7 @@
             from riderID in liftRiders
             where Program.liftCallsDict[riderID][1] == CurrentFloor
             select riderID;
-            Program.WriteToOutputCSV(departingRiders.ToList(), timeWhenStopped);
+            Program.UpdateCallerJourneyDetails(callerIDs: departingRiders.ToList(), timeDisembarked: timeWhenStopped);
             // removing disembarked riders
             liftRiders.RemoveWhere((int riderID) => Program.liftCallsDict[riderID][1] == CurrentFloor);
             departingRiders.ToList().ForEach((int riderID) => Console.WriteLine("Rider with callerID = {0}, departing at current floor = {1}, at t = {2}",
