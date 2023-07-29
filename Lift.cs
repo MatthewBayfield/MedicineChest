@@ -1,3 +1,6 @@
+﻿using SFERA.Math.Combinatorics;
+using MoreLinq;
+
 ﻿namespace MedicineChest
 {
     internal class Lift
@@ -43,7 +46,7 @@
             }
         }
 
-        public async void OperateLift()
+        public void OperateLift()
         {
             int timeWhenStopped = 0;
             int spacesAvailable = liftCapacity;
@@ -119,9 +122,29 @@
                     {
                         continue;
                 }
-                // Simulating the average stop time
-                await Task.Delay(averageStopTime * 1000);
 
+                    // Determining the optimal path for the lift after current stop:
+
+                    List<int> optimalPath = new();
+                    Task calculationTask = Task.Run(() => optimalPath = CalculateOptimalPath());
+                // Simulating the average stop time
+                    Task[] taskArray = new Task[] { calculationTask, Task.Delay(averageStopTime * 1000) };
+                    var taskGroup = Task.WhenAll(taskArray);
+                    taskGroup.Wait();
+
+                    Console.WriteLine("Order of floors in the optimal path:");
+                    optimalPath.ForEach(Console.WriteLine);
+                    int nextFloorStop = optimalPath[1];
+                    // Simulating time taken to travel to next floor stop.
+                    Console.WriteLine("Lift moving to floor = {0}.", nextFloorStop);
+                    Task task = Task.Delay(liftAdjacentFloorTravelTime * 1000 * Math.Abs(currentFloor - nextFloorStop));
+                    task.Wait();
+                    // Changing the current stop to the next stop to indicate the lift has arrived at the next stop.
+                    currentFloor = nextFloorStop;
+                    Console.WriteLine("Lift stopped at current floor = {0}, at t = {1}.", currentFloor, Program.time);
+                }
+                else
+                {
                 // Updating selected and called floor snapshots.
                     UpdateSnapshots();
                     // Check if lift is empty after updates.
@@ -130,6 +153,20 @@
                     continue;
                 }
 
+                    // Determining the optimal path for the lift after current stop:
+
+                    List<int> optimalPath = CalculateOptimalPath();
+                    Console.WriteLine("Order of floors in the optimal path:");
+                    optimalPath.ForEach(Console.WriteLine);
+                    int nextFloorStop = optimalPath[1];
+                    // Simulating time taken to travel to next floor stop.
+                    Console.WriteLine("Lift moving to floor = {0}.", nextFloorStop);
+                    Task task = Task.Delay(liftAdjacentFloorTravelTime * 1000 * Math.Abs(currentFloor - nextFloorStop));
+                    task.Wait();
+                    // Changing the current stop to the next stop to indicate the lift has arrived at the next stop.
+                    currentFloor = nextFloorStop;
+                    Console.WriteLine("Lift stopped at current floor = {0}, at t = {1}.", currentFloor, Program.time);
+                }
             }
         }
 
