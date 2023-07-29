@@ -15,7 +15,7 @@ namespace MedicineChest
         public Boolean liftFull = false;
         public HashSet<int> liftCallers = new();
         public HashSet<int> liftRiders = new();
-        public int averageStopTime = 30;
+        public int averageStopTime = 20;
         public int liftCapacity = 8;
         public int liftAdjacentFloorTravelTime = 10;
         public List<int> route = new();
