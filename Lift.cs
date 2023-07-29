@@ -196,5 +196,20 @@
             Console.WriteLine("called floor snap:");
             calledFloorsSnapshot.ForEach(Console.WriteLine);
         }
+
+        private int CalculateJthPartialSumQ_j(int j, List<int> floors)
+        {
+            // Calculation of Q_j found in expression T(P).
+
+            List<int> sumTerms = new();
+            int i = 0;
+            while (i < j)
+            {
+                sumTerms.Add((Math.Abs(floors[i + 1] - floors[i]) * liftAdjacentFloorTravelTime) + ((j - 1) * averageStopTime));
+                i++;
+            }
+            int Q_j = sumTerms.Sum();
+            return Q_j;
+        }
     } 
 }
