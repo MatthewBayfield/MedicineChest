@@ -4,7 +4,7 @@
     {
         public Dictionary<string, int> selectedFloorCounters = new();
         public Dictionary<string, int> calledFloorCounters = new();
-        public int CurrentFloor = 5;
+        public int currentFloor = 5;
         public HashSet<int> selectedFloorsLive = new();
         public HashSet<int> selectedFloorsSnapshot = new();
         public HashSet<int> calledFloorsLive = new();
@@ -16,6 +16,8 @@
         public int liftCapacity = 8;
         public int liftAdjacentFloorTravelTime = 10;
         public List<int> route = new();
+        public int numberOfStopsThreshold = 9;
+        public int numberOfFloors = 10;
 
         public Lift()
         {
@@ -62,16 +64,15 @@
                 }
 
                 // Behaviour when lift is not empty and or there are lift calls:
-
-                if (selectedFloorsLive.Contains(CurrentFloor) | calledFloorsLive.Contains(CurrentFloor))
+                if (selectedFloorsLive.Contains(currentFloor) | calledFloorsLive.Contains(currentFloor))
                 {
                     Console.WriteLine("Opening lift doors.");
                     Console.WriteLine("Waiting average stop time = {0}", averageStopTime);
                     // Removing current floor from the selected floor sets.
-                    selectedFloorsLive.Remove(CurrentFloor);
-                    selectedFloorsSnapshot.Remove(CurrentFloor);
+                    selectedFloorsLive.Remove(currentFloor);
+                    selectedFloorsSnapshot.Remove(currentFloor);
                     // Resetting counter for current floor in selectedFloorCounters.
-                    selectedFloorCounters[$"x_{CurrentFloor}"] = 0;
+                    selectedFloorCounters[$"x_{currentFloor}"] = 0;
                     // Disembarking any relevant riders at current stop.
                     DisembarkRiders(timeWhenStopped);
 
@@ -90,10 +91,10 @@
                     {
                         liftFull = false;
                         // Removing current floor from the called floor sets.
-                        calledFloorsLive.Remove(CurrentFloor);
-                        calledFloorsSnapshot.Remove(CurrentFloor);
+                        calledFloorsLive.Remove(currentFloor);
+                        calledFloorsSnapshot.Remove(currentFloor);
                         // Resetting counter for current floor in calledFloorCounters.
-                        calledFloorCounters[$"x_{CurrentFloor}"] = 0;
+                        calledFloorCounters[$"y_{currentFloor}"] = 0;
                     }
 
                     // Add selected floors for any new riders that boarded.
@@ -129,7 +130,7 @@
             // adding Output CSV entries for departing riders
             IEnumerable<int> departingRiders =
             from riderID in liftRiders
-            where Program.liftCallsDict[riderID][1] == CurrentFloor
+            where Program.liftCallsDict[riderID][1] == currentFloor
             select riderID;
             Program.UpdateCallerJourneyDetails(callerIDs: departingRiders.ToList(), timeDisembarked: timeWhenStopped);
             // removing disembarked riders
@@ -144,7 +145,7 @@
             // Obtaining the ID's of callers wanting to board the lift.
             IEnumerable<int> boardingCallers =
                     from caller in liftCallers
-                    where Program.liftCallsDict[caller][0] == CurrentFloor
+                    where Program.liftCallsDict[caller][0] == currentFloor
                     select caller;
             List<int> boardingCallersList = boardingCallers.ToList();
 
@@ -170,7 +171,7 @@
             // Getting the list of callers wanting to board the lift.
             IEnumerable<int> boardingCallers =
                     from caller in liftCallers
-                    where Program.liftCallsDict[caller][0] == CurrentFloor
+                    where Program.liftCallsDict[caller][0] == currentFloor
                     select caller;
             return (boardingCallers.ToList().Count > spacesAvailable);
         }
