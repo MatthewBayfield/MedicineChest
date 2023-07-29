@@ -244,5 +244,21 @@
             }
             return SumOfPatialSums;
         }
+
+        public string DetermineDirectionOfMostProbableTravel(int floor)
+        {
+            if ((floor - 1) > (numberOfFloors - floor))
+            {
+                return "down";
+            }
+            else if ((floor - 1) < (numberOfFloors - floor))
+            {
+                return "up";
+            }
+            else
+            {
+                return "down";
+            }
+        }
     }
 }
