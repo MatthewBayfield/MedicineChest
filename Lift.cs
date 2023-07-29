@@ -131,6 +131,14 @@ namespace MedicineChest
                     List<int> optimalPath = new();
                     Task calculationTask = Task.Run(() => optimalPath = CalculateOptimalPath());
                     // Simulating the average stop time
+                    if (Program.QuickMode)
+                    {
+                        Task[] taskArray = new Task[] { calculationTask, Task.Delay(averageStopTime * 100) };
+                        var taskGroup = Task.WhenAll(taskArray);
+                        taskGroup.Wait();
+                    }
+                    else
+                    {
                     Task[] taskArray = new Task[] { calculationTask, Task.Delay(averageStopTime * 1000) };
                     var taskGroup = Task.WhenAll(taskArray);
                     taskGroup.Wait();
@@ -140,8 +148,16 @@ namespace MedicineChest
                     int nextFloorStop = optimalPath[1];
                     // Simulating time taken to travel to next floor stop.
                     Console.WriteLine("Lift moving to floor = {0}.", nextFloorStop);
+                    if (Program.QuickMode)
+                    {
+                        Task task = Task.Delay(liftAdjacentFloorTravelTime * 100 * Math.Abs(currentFloor - nextFloorStop));
+                        task.Wait();
+                    }
+                    else
+                    {
                     Task task = Task.Delay(liftAdjacentFloorTravelTime * 1000 * Math.Abs(currentFloor - nextFloorStop));
                     task.Wait();
+                    }
                     // Changing the current stop to the next stop to indicate the lift has arrived at the next stop.
                     currentFloor = nextFloorStop;
                     Console.WriteLine("Lift stopped at current floor = {0}, at t = {1}.", currentFloor, Program.time);
@@ -164,8 +180,16 @@ namespace MedicineChest
                     int nextFloorStop = optimalPath[1];
                     // Simulating time taken to travel to next floor stop.
                     Console.WriteLine("Lift moving to floor = {0}.", nextFloorStop);
+                    if (Program.QuickMode)
+                    {
+                        Task task = Task.Delay(liftAdjacentFloorTravelTime * 100 * Math.Abs(currentFloor - nextFloorStop));
+                        task.Wait();
+                    }
+                    else
+                    {
                     Task task = Task.Delay(liftAdjacentFloorTravelTime * 1000 * Math.Abs(currentFloor - nextFloorStop));
                     task.Wait();
+                    }
                     // Changing the current stop to the next stop to indicate the lift has arrived at the next stop.
                     currentFloor = nextFloorStop;
                     Console.WriteLine("Lift stopped at current floor = {0}, at t = {1}.", currentFloor, Program.time);
