@@ -211,5 +211,18 @@
             int Q_j = sumTerms.Sum();
             return Q_j;
         }
+
+        private int eta_j(int floor)
+        {
+            // Calculation of eta_j found in expression T(P).
+
+            if (calledFloorsSnapshot.Contains(floor) & selectedFloorsSnapshot.Contains(floor))
+            {
+                return 2;
+            }
+            else
+            {
+                return 1;
+            }
     } 
 }
