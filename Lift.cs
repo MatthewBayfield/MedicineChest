@@ -35,7 +35,7 @@
             foreach (int call in callerIDs)
             {
                 liftCallers.Add(call);
-                int calledFloor = Program.liftCallsDict[call][1];
+                int calledFloor = Program.liftCallsDict[call][0];
                 calledFloorsLive.Add(calledFloor);
                 Console.WriteLine("Lift called from floor {0} at t = {1}, by callerID = {2}", calledFloor, Program.liftCallsDict[call][2], call);
             }
