@@ -197,6 +197,86 @@
             calledFloorsSnapshot.ForEach(Console.WriteLine);
         }
 
+        private List<int> RouteOptimiser(HashSet<int> floorSet)
+        {
+            int numberOfStopsInPath = floorSet.Count;
+            List<int> floorList = floorSet.ToList();
+
+            // Ideally would like to obtain all possible paths equivalent to all possible permutations of the number of floors.
+            // However this corresponds to n! lists, where n is the number of floors, thus increasing the computation time for large n.
+            // Therefore for the case of n floors, where n > 5, all permutations of 5 floors chosen from n floors will be obtained instead.
+            // This will potentially impact the path selected and thus the efficiency.
+            List<List<int>> allPossiblePaths = new();
+            if (floorList.Count > 5)
+            {
+                foreach (List<int> path in new Variations<int>(floorList, 5))
+                {
+                    allPossiblePaths.Add(new List<int>(path));
+                }
+            }
+            else
+            {
+                foreach (List<int> path in new Permutations<int>(floorList))
+                {
+                    allPossiblePaths.Add(new List<int>(path));
+                }
+            }
+
+            // Inserting the current floor at the start of each path.
+            for (int l = 0; l < allPossiblePaths.Count; ++l)
+            {
+                allPossiblePaths[l].Insert(0, currentFloor);
+            }
+            // Labelling the paths.
+            Dictionary<int, List<int>> labelledAllPossiblePaths = new();
+            int k = 0;
+            foreach (List<int> path in allPossiblePaths)
+            {
+                labelledAllPossiblePaths.Add(k, path);
+                ++k;
+            }
+            Console.WriteLine("Number of possible paths = {0}", labelledAllPossiblePaths.Count);
+
+            // Calculating the total rider time for each labelled path.
+            Dictionary<int, int> timesForAllPaths = new();
+            int totalRiderTimeForPath;
+            foreach (KeyValuePair<int, List<int>> pair in labelledAllPossiblePaths)
+            {
+                totalRiderTimeForPath = SumPartialSumsForPath(pair.Value);
+                timesForAllPaths.Add(pair.Key, totalRiderTimeForPath);
+            }
+
+            // Identifying the minimum time, and then extracting a subset of all paths that give the minimum time.
+            int minimumTotalRiderTime = timesForAllPaths.Values.ToList().Min();
+            IEnumerable<KeyValuePair<int, int>> indexedMinimumTimes =
+            from labelledTime in timesForAllPaths
+            where labelledTime.Value == minimumTotalRiderTime
+            select labelledTime;
+
+            // Distinguishing, if necessary, multiple paths that produce the minimum value, by calculating the total lift journey time for each path.
+            // Then picking any path that also minimises this total lift time. 
+            if (indexedMinimumTimes.ToList().Count > 1)
+            {
+                Dictionary<int, int> indexedLiftTotalTimes = new();
+                int minLiftTotalTime = 0;
+                foreach (KeyValuePair<int, int> pair in indexedMinimumTimes)
+                {
+                    indexedLiftTotalTimes.Add(pair.Key, CalculateJthPartialSumQ_j(numberOfStopsInPath, labelledAllPossiblePaths[pair.Key]));
+                    minLiftTotalTime = indexedLiftTotalTimes.Values.Min();
+
+                }
+                foreach (KeyValuePair<int, int> pair in indexedLiftTotalTimes)
+                {
+                    if (pair.Value == minLiftTotalTime)
+                    {
+                        return labelledAllPossiblePaths[pair.Key];
+
+                    }
+                }
+            }
+            return labelledAllPossiblePaths[indexedMinimumTimes.ToList()[0].Key];
+        }
+
         private int CalculateJthPartialSumQ_j(int j, List<int> floors)
         {
             // Calculation of Q_j found in expression T(P).
