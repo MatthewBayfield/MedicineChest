@@ -358,6 +358,7 @@ namespace MedicineChest
             List<List<int>> allPossiblePaths = new();
             if (floorList.Count > 5)
             {
+                numberOfStopsInPath = 5;
                 foreach (List<int> path in new Variations<int>(floorList, 5))
                 {
                     allPossiblePaths.Add(new List<int>(path));
