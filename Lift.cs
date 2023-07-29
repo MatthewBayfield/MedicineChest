@@ -506,11 +506,17 @@ namespace MedicineChest
                 {
                     if (calledFloor > pathForSelectedFloors[t] & calledFloor < pathForSelectedFloors[t + 1])
                     {
+                        if (!pathForSelectedFloors.Contains(calledFloor))
+                        {
                         passedByCalledFloorsGoingUp.Add(new List<int>(new int[] { t + 1, calledFloor }));
+                    }
                     }
                     else if (calledFloor < pathForSelectedFloors[t] & calledFloor > pathForSelectedFloors[t + 1])
                     {
+                        if (!pathForSelectedFloors.Contains(calledFloor))
+                        {
                         passedByCalledFloorsGoingDown.Add(new List<int>(new int[] { t + 1, calledFloor }));
+                    }
                     }
                     else
                     {
