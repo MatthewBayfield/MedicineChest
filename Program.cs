@@ -26,6 +26,10 @@ namespace MedicineChest
             timer.Start();
             Console.Clear();
             Console.WriteLine("Lift now operational, timer started.");
+            // Start the lift.
+            Task liftTask = new Task(lift.OperateLift);
+            liftTask.Start();
+            liftTask.Wait();
         }
 
         public static void UpdateTime(Object? sender, ElapsedEventArgs e)

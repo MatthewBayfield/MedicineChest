@@ -124,13 +124,13 @@ namespace MedicineChest
                     if (selectedFloorsSnapshot.Count == 0 & calledFloorsSnapshot.Count == 0)
                     {
                         continue;
-                }
+                    }
 
                     // Determining the optimal path for the lift after current stop:
 
                     List<int> optimalPath = new();
                     Task calculationTask = Task.Run(() => optimalPath = CalculateOptimalPath());
-                // Simulating the average stop time
+                    // Simulating the average stop time
                     Task[] taskArray = new Task[] { calculationTask, Task.Delay(averageStopTime * 1000) };
                     var taskGroup = Task.WhenAll(taskArray);
                     taskGroup.Wait();
@@ -148,13 +148,13 @@ namespace MedicineChest
                 }
                 else
                 {
-                // Updating selected and called floor snapshots.
+                    // Updating selected and called floor snapshots.
                     UpdateSnapshots();
                     // Check if lift is empty after updates.
-                if (selectedFloorsSnapshot.Count == 0 & calledFloorsSnapshot.Count == 0)
-                {
-                    continue;
-                }
+                    if (selectedFloorsSnapshot.Count == 0 & calledFloorsSnapshot.Count == 0)
+                    {
+                        continue;
+                    }
 
                     // Determining the optimal path for the lift after current stop:
 
@@ -180,13 +180,13 @@ namespace MedicineChest
             from riderID in liftRiders
             where Program.liftCallsDict[riderID][1] == currentFloor
             select riderID;
-            
+
             // Updating the journey details of the departing riders
             Program.UpdateCallerJourneyDetails(callerIDs: departingRiders.ToList(), timeDisembarked: timeWhenStopped);
             // removing disembarked riders
             departingRiders.ToList().ForEach((int riderID) => Console.WriteLine("Rider with callerID = {0}, departing at current floor = {1}, at t = {2}",
                                                                                 riderID, currentFloor, timeWhenStopped));
-            liftRiders.RemoveWhere((int riderID) => Program.liftCallsDict[riderID][1] == currentFloor);            
+            liftRiders.RemoveWhere((int riderID) => Program.liftCallsDict[riderID][1] == currentFloor);
         }
 
         private void SelectFloors(int spacesAvailable, int timeWhenStopped)
@@ -453,7 +453,7 @@ namespace MedicineChest
             {
                 return 1;
             }
-    } 
+        }
 
         private int SumPartialSumsForPath(List<int> floors)
         {
