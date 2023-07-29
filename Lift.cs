@@ -177,5 +177,16 @@
                     select caller;
             return (boardingCallers.ToList().Count > spacesAvailable);
         }
+
+        public void UpdateSnapshots()
+        {
+            // Creating deep copies 
+            selectedFloorsSnapshot = new HashSet<int>(selectedFloorsLive);
+            calledFloorsSnapshot = new HashSet<int>(calledFloorsLive);
+            Console.WriteLine("selected floor snap:");
+            selectedFloorsSnapshot.ForEach(Console.WriteLine);
+            Console.WriteLine("called floor snap:");
+            calledFloorsSnapshot.ForEach(Console.WriteLine);
+        }
     } 
 }
