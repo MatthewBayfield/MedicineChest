@@ -109,14 +109,22 @@
                     {
                         calledFloorCounters[$"x_{floor}"] += 1;
                     }
+                    Console.WriteLine("Closing lift doors.");
+
+
+                    // Updating selected and called floor snapshots.
+                    UpdateSnapshots();
+                    // Check if lift is empty after updates.
+                    if (selectedFloorsSnapshot.Count == 0 & calledFloorsSnapshot.Count == 0)
+                    {
+                        continue;
                 }
                 // Simulating the average stop time
                 await Task.Delay(averageStopTime * 1000);
 
                 // Updating selected and called floor snapshots.
-                selectedFloorsSnapshot = new HashSet<int>(selectedFloorsLive);
-                calledFloorsSnapshot = new HashSet<int>(calledFloorsLive);
-                // check if there are any calls or selected floors left after updates.
+                    UpdateSnapshots();
+                    // Check if lift is empty after updates.
                 if (selectedFloorsSnapshot.Count == 0 & calledFloorsSnapshot.Count == 0)
                 {
                     continue;
