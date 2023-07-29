@@ -1,7 +1,7 @@
 ﻿using SFERA.Math.Combinatorics;
 using MoreLinq;
 
-﻿namespace MedicineChest
+namespace MedicineChest
 {
     internal class Lift
     {
@@ -84,11 +84,13 @@ using MoreLinq;
                     if (liftRiders.Count == liftCapacity)
                     {
                         liftFull = true;
+                        Console.WriteLine("Lift is now full.");
                     }
 
                     else if (CanAllCallersBoard(spacesAvailable))
                     {
                         liftFull = true;
+                        Console.WriteLine("Lift is now full.");
                     }
                     else
                     {
@@ -102,7 +104,8 @@ using MoreLinq;
 
                     // Add selected floors for any new riders that boarded.
                     SelectFloors(spacesAvailable, timeWhenStopped);
-
+                    Console.WriteLine("Floors in selectedFloorsLive:");
+                    selectedFloorsLive.ForEach(Console.WriteLine);
                     // Updating counters for remaining selected and called floors
                     foreach (int floor in selectedFloorsSnapshot)
                     {
@@ -110,7 +113,7 @@ using MoreLinq;
                     }
                     foreach (int floor in calledFloorsSnapshot)
                     {
-                        calledFloorCounters[$"x_{floor}"] += 1;
+                        calledFloorCounters[$"y_{floor}"] += 1;
                     }
                     Console.WriteLine("Closing lift doors.");
 
@@ -213,6 +216,7 @@ using MoreLinq;
             }
         }
 
+
         private bool CanAllCallersBoard(int spacesAvailable)
         {
             // Getting the list of callers wanting to board the lift.
@@ -220,6 +224,7 @@ using MoreLinq;
                     from caller in liftCallers
                     where Program.liftCallsDict[caller][0] == currentFloor
                     select caller;
+            // Return boolean indicating whether they can all board.
             return (boardingCallers.ToList().Count > spacesAvailable);
         }
 
