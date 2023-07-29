@@ -53,8 +53,11 @@
 
                 // Behaviour when lift is empty and no lift calls:
 
+                // Corresponds to the lift being empty
                 if (selectedFloorsLive.Count == 0 & calledFloorsLive.Count == 0)
                 {
+                    // return if necessary to floor 5
+                    currentFloor = 5;
                     continue;
                 }
 
