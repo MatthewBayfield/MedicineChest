@@ -197,6 +197,113 @@
             calledFloorsSnapshot.ForEach(Console.WriteLine);
         }
 
+        private List<int> CalculateOptimalPath()
+        {
+            // Creating sets to store which floors have exceeded the stops since visited threshold.
+            HashSet<int> thresholdExceededSelectedFloors = new();
+            HashSet<int> thresholdExceededCalledFloors = new();
+            // Adding any floors that have exceeded the threshold to the respective sets.
+            foreach (int floor in selectedFloorsSnapshot)
+            {
+                if (selectedFloorCounters[$"x_{floor}"] >= 9)
+                {
+                    thresholdExceededSelectedFloors.Add(floor);
+                }
+            }
+
+            foreach (int floor in calledFloorsSnapshot)
+            {
+                if (calledFloorCounters[$"y_{floor}"] >= 9)
+                {
+                    thresholdExceededCalledFloors.Add(floor);
+                }
+            }
+
+            // Calculating the optimal route as function of the selected and called floor context:
+
+            // Both selected and called floors exist. Lift is not Full.
+            if (calledFloorsSnapshot.Count != 0 & selectedFloorsSnapshot.Count != 0 & !liftFull)
+            {
+                // No Threshold exceeded called floors exist, threshold exceeded selected floors exist.
+                if (thresholdExceededCalledFloors.Count == 0 & thresholdExceededSelectedFloors.Count != 0)
+                {
+                    Console.WriteLine("Prioritising threshold exceeded selected floors.");
+                    return RouteOptimiser(thresholdExceededSelectedFloors);
+                }
+
+                // Threshold exceeded called floors exist, no threshold exceeded selected floors exist.
+                if (thresholdExceededCalledFloors.Count != 0 & thresholdExceededSelectedFloors.Count == 0)
+                {
+                    Console.WriteLine("Prioritising threshold exceeded called floors.");
+                    return RouteOptimiser(thresholdExceededCalledFloors);
+                }
+
+                // Threshold exceeded called floors exist, threshold exceeded selected floors exist.
+                if (thresholdExceededCalledFloors.Count != 0 & thresholdExceededSelectedFloors.Count != 0)
+                {
+                    Console.WriteLine("Prioritising threshold exceeded selected/called floors.");
+                    List<int> optimalPathForSelectedFloors = RouteOptimiser(thresholdExceededSelectedFloors);
+                    Console.WriteLine("Order of floors in optimal path, before incorporating called floors:");
+                    optimalPathForSelectedFloors.ForEach(Console.WriteLine);
+                    return IncorporateCalledFloors(optimalPathForSelectedFloors, thresholdExceededCalledFloors.ToList());
+                }
+
+                // Normal called floors exist, normal selected floors exist.
+                if (thresholdExceededCalledFloors.Count == 0 & thresholdExceededSelectedFloors.Count == 0)
+                {
+                    List<int> optimalPathForSelectedFloors = RouteOptimiser(selectedFloorsSnapshot);
+                    Console.WriteLine("Order of floors in optimal path, before incorporating called floors:");
+                    optimalPathForSelectedFloors.ForEach(Console.WriteLine);
+                    return IncorporateCalledFloors(optimalPathForSelectedFloors, calledFloorsSnapshot.ToList());
+                }
+            }
+
+            // Both selected and called floors exist. Lift is Full.
+            if (calledFloorsSnapshot.Count != 0 & selectedFloorsSnapshot.Count != 0 & liftFull)
+            {
+                // Only normal selected floors exist.
+                if (thresholdExceededSelectedFloors.Count == 0)
+                {
+                    return RouteOptimiser(selectedFloorsSnapshot);
+                }
+                else
+                {
+                    Console.WriteLine("Prioritising threshold exceeded selected floors.");
+                    return RouteOptimiser(thresholdExceededSelectedFloors);
+                }
+            }
+
+            // No called floors, and only normal selected floors exist.
+            if (calledFloorsSnapshot.Count == 0 & thresholdExceededSelectedFloors.Count == 0)
+            {
+                return RouteOptimiser(selectedFloorsSnapshot);
+            }
+
+            // No called floors, and threshold exceeded selected floors exist.
+            if (calledFloorsSnapshot.Count == 0 & thresholdExceededSelectedFloors.Count != 0)
+            {
+                Console.WriteLine("Prioritising threshold exceeded selected floors.");
+                return RouteOptimiser(thresholdExceededSelectedFloors);
+            }
+
+            // No selected floors, and only normal called floors exist.
+            if (calledFloorsSnapshot.Count != 0 & selectedFloorsSnapshot.Count == 0 & thresholdExceededCalledFloors.Count == 0)
+            {
+                return RouteOptimiser(calledFloorsSnapshot);
+            }
+
+            // No selected floors, and only threshold exceeded called floors exist.
+            if (calledFloorsSnapshot.Count != 0 & selectedFloorsSnapshot.Count == 0 & thresholdExceededCalledFloors.Count != 0)
+            {
+                Console.WriteLine("Prioritising threshold exceeded called floors.");
+                return RouteOptimiser(thresholdExceededCalledFloors);
+            }
+
+            // Default return value.
+            List<int> emptyPath = new();
+            return emptyPath;
+        }
+
         private List<int> RouteOptimiser(HashSet<int> floorSet)
         {
             int numberOfStopsInPath = floorSet.Count;
