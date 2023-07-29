@@ -4,6 +4,7 @@ namespace MedicineChest
 {
     internal class Program
     {
+        public static bool terminate = false;
         public static int time = 0;
         private static System.Timers.Timer timer = new(1000);
         private static int LastCallTime;
@@ -47,8 +48,9 @@ namespace MedicineChest
             if (time > LastCallTime & lift.selectedFloorsLive.Count == 0 & lift.calledFloorsLive.Count == 0)
             {
                 timer.Stop();
+                Console.WriteLine("Lift is now empty, no more calls exist.");
+                terminate = true;
                 // add code here for writing total time to CSV
-                Environment.Exit(0);
             }
 
         }

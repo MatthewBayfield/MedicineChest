@@ -48,10 +48,10 @@
             int timeWhenStopped = 0;
             int spacesAvailable = liftCapacity;
             // Main Lift Operation Loop.
-            while (true)
+            Console.WriteLine("Lift at floor = {0}, at t = {1}.", currentFloor, timeWhenStopped);
+            while (!Program.terminate)
             {
                 timeWhenStopped = Program.time;
-                Console.WriteLine("Lift stopped at current floor = {0}, at t = {1}.", CurrentFloor, timeWhenStopped);
 
                 // Behaviour when lift is empty and no lift calls:
 
