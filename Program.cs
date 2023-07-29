@@ -1,5 +1,4 @@
-﻿using System.Net.Http.Headers;
-using System.Timers;
+﻿using System.Timers;
 
 namespace MedicineChest
 {
@@ -16,6 +15,7 @@ namespace MedicineChest
         private static Dictionary<int, List<int>> CallerJourneyDetails = new();
         private static List<List<object>> LiftJourneyDetails = new();
         private static string? OutputCSVDirectoryPath;
+        public static bool QuickMode = false;
 
         static void Main(string[] args)
         {
@@ -24,7 +24,12 @@ namespace MedicineChest
             LastCallTime = liftCallsList.Last()[3];
             // Get user to specify a valid output directory to store the output CSV.
             OutputCSVDirectoryPath = GetOutputCSVDirectory();
+            SetQuickModeParam();
             //start the timer.
+            if (QuickMode)
+            {
+                timer.Interval = 100;
+            }
             timer.AutoReset = true;
             timer.Elapsed += UpdateTime;
             timer.Start();
@@ -190,6 +195,51 @@ namespace MedicineChest
                 catch (ArgumentException e)
                 {
                     Console.WriteLine("No such directory path exists or the directory path is invalid. Please check the path is correct.");
+                    Console.WriteLine(e.Message);
+                }
+            }
+        }
+
+        private static void SetQuickModeParam()
+        {
+            string? input = "r";
+            Console.WriteLine("In this prototype algorithm, the average lift stop time (20s), and the time to travel between adjacent floors (10s) are simulated.");
+            Console.WriteLine("By default the algorthm runs in real-time; but it can run in a quick mode whereby the timer is sped up.");
+            Console.WriteLine("To run in Quick mode please enter \"q\", or otherwise enter \"r\".");
+            while (true)
+            {
+                try
+                {
+                    
+                    input = Console.ReadLine();
+                    if (input == null)
+                    {
+                        continue;
+                    }
+                    if (input == "q")
+                    {
+                        QuickMode = true;
+                        break;
+                    }
+                    else if (input == "r")
+                    {
+                        QuickMode = false;
+                        break;
+                    }
+                    else
+                    {
+                        Console.WriteLine("Invalid entry, please enter either \"q\" or \"r\".");
+                    }
+                }
+
+                catch (IOException e)
+                {
+                    Console.WriteLine("Invalid entry, please enter either \"q\" or \"r\".");
+                    Console.WriteLine(e.Message);
+                }
+                catch (ArgumentException e)
+                {
+                    Console.WriteLine("Invalid entry, please enter either \"q\" or \"r\".");
                     Console.WriteLine(e.Message);
                 }
             }
