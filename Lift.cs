@@ -225,4 +225,24 @@
                 return 1;
             }
     } 
+
+        private int SumPartialSumsForPath(List<int> floors)
+        {
+            List<int> partialSumTerms = new();
+            int j = 1;
+            int numberOfStopsInPath = floors.Count - 1;
+            while (j <= numberOfStopsInPath)
+            {
+                partialSumTerms.Add(CalculateJthPartialSumQ_j(j, floors));
+                ++j;
+            }
+            // T(P) calculation for path P defined by floors.
+            int SumOfPatialSums = 0;
+            foreach (int term in partialSumTerms)
+            {
+                SumOfPatialSums += term * eta_j(floors[j]);
+            }
+            return SumOfPatialSums;
+        }
+    }
 }
