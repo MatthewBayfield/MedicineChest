@@ -115,8 +115,19 @@ namespace MedicineChest
                     {
                         calledFloorCounters[$"y_{floor}"] += 1;
                     }
-                    Console.WriteLine("Closing lift doors.");
 
+                    Console.WriteLine("selectedFloorCounters:");
+                    foreach (KeyValuePair<string, int> pair in selectedFloorCounters)
+                    {
+                        Console.WriteLine("{0} = {1}", pair.Key, pair.Value);
+                    }
+                    Console.WriteLine("calledFloorCounters:");
+                    foreach (KeyValuePair<string, int> pair in calledFloorCounters)
+                    {
+                        Console.WriteLine("{0} = {1}", pair.Key, pair.Value);
+                    }
+
+                    Console.WriteLine("Closing lift doors."); 
 
                     // Updating selected and called floor snapshots.
                     UpdateSnapshots();
@@ -139,10 +150,10 @@ namespace MedicineChest
                     }
                     else
                     {
-                    Task[] taskArray = new Task[] { calculationTask, Task.Delay(averageStopTime * 1000) };
-                    var taskGroup = Task.WhenAll(taskArray);
-                    taskGroup.Wait();
-
+                        Task[] taskArray = new Task[] { calculationTask, Task.Delay(averageStopTime * 1000) };
+                        var taskGroup = Task.WhenAll(taskArray);
+                        taskGroup.Wait();
+                    }
                     Console.WriteLine("Order of floors in the optimal path:");
                     optimalPath.ForEach(Console.WriteLine);
                     int nextFloorStop = optimalPath[1];
@@ -155,8 +166,8 @@ namespace MedicineChest
                     }
                     else
                     {
-                    Task task = Task.Delay(liftAdjacentFloorTravelTime * 1000 * Math.Abs(currentFloor - nextFloorStop));
-                    task.Wait();
+                        Task task = Task.Delay(liftAdjacentFloorTravelTime * 1000 * Math.Abs(currentFloor - nextFloorStop));
+                        task.Wait();
                     }
                     // Changing the current stop to the next stop to indicate the lift has arrived at the next stop.
                     currentFloor = nextFloorStop;
@@ -187,8 +198,8 @@ namespace MedicineChest
                     }
                     else
                     {
-                    Task task = Task.Delay(liftAdjacentFloorTravelTime * 1000 * Math.Abs(currentFloor - nextFloorStop));
-                    task.Wait();
+                        Task task = Task.Delay(liftAdjacentFloorTravelTime * 1000 * Math.Abs(currentFloor - nextFloorStop));
+                        task.Wait();
                     }
                     // Changing the current stop to the next stop to indicate the lift has arrived at the next stop.
                     currentFloor = nextFloorStop;
@@ -257,9 +268,9 @@ namespace MedicineChest
             // Creating deep copies 
             selectedFloorsSnapshot = new HashSet<int>(selectedFloorsLive);
             calledFloorsSnapshot = new HashSet<int>(calledFloorsLive);
-            Console.WriteLine("selected floor snap:");
+            Console.WriteLine("Floors in selectedFloorsSnapshot:");
             selectedFloorsSnapshot.ForEach(Console.WriteLine);
-            Console.WriteLine("called floor snap:");
+            Console.WriteLine("Floors in calledFloorsSnapshot:");
             calledFloorsSnapshot.ForEach(Console.WriteLine);
         }
 
@@ -533,15 +544,15 @@ namespace MedicineChest
                     {
                         if (!pathForSelectedFloors.Contains(calledFloor))
                         {
-                        passedByCalledFloorsGoingUp.Add(new List<int>(new int[] { t + 1, calledFloor }));
-                    }
+                            passedByCalledFloorsGoingUp.Add(new List<int>(new int[] { t + 1, calledFloor }));
+                        }
                     }
                     else if (calledFloor < pathForSelectedFloors[t] & calledFloor > pathForSelectedFloors[t + 1])
                     {
                         if (!pathForSelectedFloors.Contains(calledFloor))
                         {
-                        passedByCalledFloorsGoingDown.Add(new List<int>(new int[] { t + 1, calledFloor }));
-                    }
+                            passedByCalledFloorsGoingDown.Add(new List<int>(new int[] { t + 1, calledFloor }));
+                        }
                     }
                     else
                     {
