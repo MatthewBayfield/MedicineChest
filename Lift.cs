@@ -260,5 +260,90 @@
                 return "down";
             }
         }
+
+        private List<int> IncorporateCalledFloors(List<int> pathForSelectedFloors, List<int> calledFloors)
+        {
+            // Path for only the selected floors.
+            pathForSelectedFloors = new(pathForSelectedFloors);
+
+            // Determining which called floors are passed-by when travelling between selected destination floors:
+
+            List<List<int>> passedByCalledFloorsGoingUp = new();
+            List<List<int>> passedByCalledFloorsGoingDown = new();
+            List<int> remainingCalledFloors = new();
+            for (int t = 0; t < pathForSelectedFloors.Count - 1; ++t)
+            {
+                foreach (int calledFloor in calledFloors)
+                {
+                    if (calledFloor > pathForSelectedFloors[t] & calledFloor < pathForSelectedFloors[t + 1])
+                    {
+                        passedByCalledFloorsGoingUp.Add(new List<int>(new int[] { t + 1, calledFloor }));
+                    }
+                    else if (calledFloor < pathForSelectedFloors[t] & calledFloor > pathForSelectedFloors[t + 1])
+                    {
+                        passedByCalledFloorsGoingDown.Add(new List<int>(new int[] { t + 1, calledFloor }));
+                    }
+                    else
+                    {
+                        remainingCalledFloors.Add(calledFloor);
+                    }
+                }
+            }
+
+            // Determining the most probable travel direction of the callers at each floor:
+
+            List<List<int>> calledFloorsGoingInRightDirection = new();
+
+            if (passedByCalledFloorsGoingUp.Count != 0)
+            {
+                IEnumerable<List<int>> calledFloorsWithUpTravelDirection =
+                    from term in passedByCalledFloorsGoingUp
+                    where DetermineDirectionOfMostProbableTravel(term[1]) == "up"
+                    select term;
+                foreach (List<int> term in calledFloorsWithUpTravelDirection)
+                {
+                    calledFloorsGoingInRightDirection.Add(term);
+                    break;
+                }
+            }
+            if (passedByCalledFloorsGoingDown.Count != 0)
+            {
+                IEnumerable<List<int>> calledFloorsWithDownTravelDirection =
+                    from term in passedByCalledFloorsGoingDown
+                    where DetermineDirectionOfMostProbableTravel(term[1]) == "down"
+                    select term;
+                foreach (List<int> term in calledFloorsWithDownTravelDirection)
+                {
+                    calledFloorsGoingInRightDirection.Add(term);
+                    break;
+                }
+            }
+
+            // Selecting if available the first appropriate caller to pick up:
+
+            if (calledFloorsGoingInRightDirection.Count != 0)
+            {
+                Console.WriteLine("Passed-by floors with right travel direction = {0}", calledFloorsGoingInRightDirection.Count);
+                int p = 0;
+                while (p < pathForSelectedFloors.Count)
+                {
+                    foreach (List<int> term in calledFloorsGoingInRightDirection)
+                    {
+                        if (term[0] == p & !pathForSelectedFloors.Contains(term[1]))
+                        {
+                            pathForSelectedFloors.Insert(term[0], term[1]);
+                            return pathForSelectedFloors;
+                        }
+                    }
+                    ++p;
+                }
+            }
+            Console.WriteLine("Passed-by floors with right travel direction = {0}", calledFloorsGoingInRightDirection.Count);
+            // Treating the remaining called floors as if they were selected floors.
+            HashSet<int> expandedFloorSet = new(pathForSelectedFloors.GetRange(1, pathForSelectedFloors.Count - 1));
+            remainingCalledFloors.ForEach((int floor) => expandedFloorSet.Add(floor));
+            Console.WriteLine("Remaining floors = {0}", expandedFloorSet.Count);
+            return RouteOptimiser(expandedFloorSet);
+        }
     }
 }
