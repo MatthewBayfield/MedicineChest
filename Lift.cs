@@ -127,16 +127,18 @@
 
         private void DisembarkRiders(int timeWhenStopped)
         {
-            // adding Output CSV entries for departing riders
+            // Extracting departing riders
             IEnumerable<int> departingRiders =
             from riderID in liftRiders
             where Program.liftCallsDict[riderID][1] == currentFloor
             select riderID;
+            
+            // Updating the journey details of the departing riders
             Program.UpdateCallerJourneyDetails(callerIDs: departingRiders.ToList(), timeDisembarked: timeWhenStopped);
             // removing disembarked riders
-            liftRiders.RemoveWhere((int riderID) => Program.liftCallsDict[riderID][1] == CurrentFloor);
             departingRiders.ToList().ForEach((int riderID) => Console.WriteLine("Rider with callerID = {0}, departing at current floor = {1}, at t = {2}",
-                                                                                riderID, CurrentFloor, timeWhenStopped));
+                                                                                riderID, currentFloor, timeWhenStopped));
+            liftRiders.RemoveWhere((int riderID) => Program.liftCallsDict[riderID][1] == currentFloor);            
         }
 
         private void SelectFloors(int spacesAvailable, int timeWhenStopped)
