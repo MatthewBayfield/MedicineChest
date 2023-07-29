@@ -1,4 +1,5 @@
-﻿using System.Timers;
+﻿using System.Net.Http.Headers;
+using System.Timers;
 
 namespace MedicineChest
 {
@@ -14,6 +15,7 @@ namespace MedicineChest
         private static Lift lift = new();
         private static Dictionary<int, List<int>> CallerJourneyDetails = new();
         private static List<List<object>> LiftJourneyDetails = new();
+        private static string? OutputCSVDirectoryPath;
 
         static void Main(string[] args)
         {
@@ -21,7 +23,7 @@ namespace MedicineChest
             ProcessInputCSV();
             LastCallTime = liftCallsList.Last()[3];
             // Get user to specify a valid output directory to store the output CSV.
-            GetOutputCSVDirectory();
+            OutputCSVDirectoryPath = GetOutputCSVDirectory();
             //start the timer.
             timer.AutoReset = true;
             timer.Elapsed += UpdateTime;
@@ -150,7 +152,7 @@ namespace MedicineChest
             }
         }
 
-        private static void GetOutputCSVDirectory()
+        private static string GetOutputCSVDirectory()
         {
             string currentWorkingDirectory = Directory.GetCurrentDirectory();
             string? path;
@@ -168,7 +170,7 @@ namespace MedicineChest
                     relativePath = Path.GetRelativePath(currentWorkingDirectory, path);
                     if (Path.Exists(relativePath))
                     {
-                        break;
+                        return path;
                     }
                     else if (path == "exit")
                     {
