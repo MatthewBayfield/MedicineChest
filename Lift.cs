@@ -469,7 +469,7 @@ namespace MedicineChest
             int SumOfPatialSums = 0;
             foreach (int term in partialSumTerms)
             {
-                SumOfPatialSums += term * eta_j(floors[j]);
+                SumOfPatialSums += term * eta_j(floors[partialSumTerms.IndexOf(term) + 1]);
             }
             return SumOfPatialSums;
         }
