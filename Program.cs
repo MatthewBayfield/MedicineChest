@@ -20,6 +20,8 @@ namespace MedicineChest
             // Load user input CSV file.
             ProcessInputCSV();
             LastCallTime = liftCallsList.Last()[3];
+            // Get user to specify a valid output directory to store the output CSV.
+            GetOutputCSVDirectory();
             //start the timer.
             timer.AutoReset = true;
             timer.Elapsed += UpdateTime;
@@ -68,7 +70,7 @@ namespace MedicineChest
             {
                 try
                 {
-                    Console.WriteLine("Please enter the file path of the csv file, not enclosed in quotes.");
+                    Console.WriteLine("Please enter the absolute file path of the csv file, not enclosed in quotes.");
                     filePath = Console.ReadLine();
                     if (filePath == null)
                     {
@@ -145,6 +147,49 @@ namespace MedicineChest
                 Console.WriteLine("Please restart the program and try again, if the problem persists check the file and or file path.");
                 Console.WriteLine(e.Message);
                 Environment.Exit(0);
+            }
+        }
+
+        private static void GetOutputCSVDirectory()
+        {
+            string currentWorkingDirectory = Directory.GetCurrentDirectory();
+            string? path;
+            string relativePath;
+            while (true)
+            {
+                try
+                {
+                    Console.WriteLine("Please enter the absolute path to a valid directory to hold the output csv file, not enclosed in quotes.");
+                    path = Console.ReadLine();
+                    if (path == null)
+                    {
+                        continue;
+                    }
+                    relativePath = Path.GetRelativePath(currentWorkingDirectory, path);
+                    if (Path.Exists(relativePath))
+                    {
+                        break;
+                    }
+                    else if (path == "exit")
+                    {
+                        Environment.Exit(0);
+                    }
+                    else
+                    {
+                        Console.WriteLine("No such directory path exists or the directory path is invalid. Please check the path is correct, or enter \"exit\" to exit the program.");
+                    }
+                }
+
+                catch (IOException e)
+                {
+                    Console.WriteLine("No such directory path exists or the directory path is invalid. Please check the path is correct.");
+                    Console.WriteLine(e.Message);
+                }
+                catch (ArgumentException e)
+                {
+                    Console.WriteLine("No such directory path exists or the directory path is invalid. Please check the path is correct.");
+                    Console.WriteLine(e.Message);
+                }
             }
         }
 
