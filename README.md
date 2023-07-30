@@ -229,6 +229,15 @@ To improve the algorithm, its behaviour needs to be altered in the scenario wher
 to only visit threshold exceeded called floors when the lift is at least half empty, so that more people can board than there are currently on the lift. This idea and others will be
 trialed shortly and the algorithm performance reassessed.
 
+## Technologies used
+- C#
+
+## Credits
+
+### Main packages used
+- morelinq - used an extension to allow a foreach method on HashSet types.
+- SFERA.Math.Combinatorics - used to obtain all permutations and variations of the sets of floors, when calculating all possible paths.
+
 
 
 
