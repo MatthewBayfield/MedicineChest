@@ -15,7 +15,7 @@ They have high expectations for the lift with a strong desire for efficiency. To
 - The lift will have a maximum capacity of 8 people.
 
 ## Algorithm Design
-**For a complete and full thorough discussion of the algorithm design please see...** 
+**For a complete and full thorough discussion of the algorithm design please see [lift_algorithm_design.pdf](lift_algorithm_design.pdf) 
 
 What follows is a summary or outline of the complete design process.
 
