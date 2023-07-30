@@ -1,5 +1,4 @@
-﻿using System.ComponentModel;
-using System.Timers;
+﻿using System.Timers;
 
 namespace MedicineChest
 {
@@ -65,9 +64,7 @@ namespace MedicineChest
                 timer.Stop();
                 Console.WriteLine("Lift is now empty, no more calls exist, t = {0}", time);
                 terminate = true;
-                // add code here for writing total time to CSV
             }
-
         }
 
         private static void ProcessInputCSV()
@@ -329,6 +326,7 @@ namespace MedicineChest
                 outputCSVDataPartTwo.Add(string.Join(",", record));
             }
 
+            // Writing records to Output CSV file:
 
             List<string> biggerList;
             List<string> smallerList;
@@ -361,12 +359,13 @@ namespace MedicineChest
                 }
             }
             
-
-
             try
             {
                 outputCSVDataTotal.Insert(0, outputHeadings);
                 File.AppendAllLines(OutputCSVFilePath, outputCSVDataTotal);
+                Console.WriteLine("");
+                Console.WriteLine("Output CSV file containing lift and caller journey details generated at:");
+                Console.WriteLine(Path.GetFullPath(OutputCSVFilePath));
             }
 
             catch (Exception e)
@@ -374,7 +373,6 @@ namespace MedicineChest
                 Console.Write("Unable to write caller journey details to output CSV file.");
                 Console.WriteLine(e.Message);
             }
-            
         }
 
         private static string ConvertListToPrintableRepresentation(List<int> list)
