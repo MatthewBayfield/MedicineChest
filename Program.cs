@@ -14,7 +14,7 @@ namespace MedicineChest
         private static Lift lift = new();
         private static Dictionary<int, List<int>> CallerJourneyDetails = new();
         private static List<List<object>> LiftJourneyDetails = new();
-        private static string? OutputCSVDirectoryPath;
+        private static string? OutputCSVFilePath;
         public static bool QuickMode = false;
 
         static void Main(string[] args)
@@ -23,7 +23,7 @@ namespace MedicineChest
             ProcessInputCSV();
             LastCallTime = liftCallsList.Last()[3];
             // Get user to specify a valid output directory to store the output CSV.
-            OutputCSVDirectoryPath = GetOutputCSVDirectory();
+            GetOutputCSVDirectory();
             SetQuickModeParam();
             //start the timer.
             if (QuickMode)
@@ -157,7 +157,7 @@ namespace MedicineChest
             }
         }
 
-        private static string GetOutputCSVDirectory()
+        private static void GetOutputCSVDirectory()
         {
             string currentWorkingDirectory = Directory.GetCurrentDirectory();
             string? path;
@@ -175,7 +175,12 @@ namespace MedicineChest
                     relativePath = Path.GetRelativePath(currentWorkingDirectory, path);
                     if (Path.Exists(relativePath))
                     {
-                        return path;
+                        using (FileStream fs = File.Create(relativePath + "outputCSV.csv"))
+                        {
+
+                        }
+                        OutputCSVFilePath = (relativePath + "outputCSV.csv");
+                        return;
                     }
                     else if (path == "exit")
                     {
