@@ -13,7 +13,7 @@ namespace MedicineChest
         public static Dictionary<int, List<int>> liftCallsDict = new();
         private static Lift lift = new();
         private static Dictionary<int, List<int>> CallerJourneyDetails = new();
-        private static List<List<object>> LiftJourneyDetails = new();
+        private static List<List<string>> LiftJourneyDetails = new();
         private static string? OutputCSVFilePath;
         public static bool QuickMode = false;
 
@@ -257,7 +257,14 @@ namespace MedicineChest
 
         public static void UpdateLiftJourneyDetails(int currentFloor, int time, HashSet<int> liftRidersAfterStop, HashSet<int> liftCallersAfterStop, List<int> routeAfterStop)
         {
-            List<object> liftRecord = new List<object>(new object[] { time, currentFloor, liftRidersAfterStop, liftCallersAfterStop, routeAfterStop });
+            List<string> liftRecord = new()
+            {
+                time.ToString(),
+                currentFloor.ToString(),
+                ConvertListToPrintableRepresentation(liftRidersAfterStop.ToList()),
+                ConvertListToPrintableRepresentation(liftCallersAfterStop.ToList()),
+                ConvertListToPrintableRepresentation(routeAfterStop)
+            }; 
             LiftJourneyDetails.Add(liftRecord);
         }
 
@@ -283,6 +290,16 @@ namespace MedicineChest
         public static void WriteToOutputCSV()
         {
 
+        private static string ConvertListToPrintableRepresentation(List<int> list)
+        {
+            string stringForm = "\"(";
+            for (int i = 0; i < list.Count; ++i)
+            {
+                stringForm += (list[i].ToString() +",");
+            }
+            stringForm += ")\"";
+
+            return stringForm;
         }
     }
 }
