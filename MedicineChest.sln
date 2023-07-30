@@ -3,7 +3,12 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.6.33829.357
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MedicineChest", "MedicineChest.csproj", "{4006F96A-2B99-4DA0-95DB-3EE7A0A1668D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MedicineChest", "MedicineChest.csproj", "{4006F96A-2B99-4DA0-95DB-3EE7A0A1668D}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docs", "Docs", "{85C4EFF1-13C0-4FEF-BD48-375CB652D5EE}"
+	ProjectSection(SolutionItems) = preProject
+		..\..\..\Dropbox\lift_algorithm_design.pdf = ..\..\..\Dropbox\lift_algorithm_design.pdf
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
