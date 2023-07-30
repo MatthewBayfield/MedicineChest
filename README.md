@@ -15,7 +15,7 @@ They have high expectations for the lift with a strong desire for efficiency. To
 - The lift will have a maximum capacity of 8 people.
 
 ## Algorithm Design
-**For a complete and full thorough discussion of the algorithm design please see [lift_algorithm_design.pdf](lift_algorithm_design.pdf) 
+**For a complete and full thorough discussion of the algorithm design please see [lift_algorithm_design.pdf](lift_algorithm_design.pdf)** 
 
 What follows is a summary or outline of the complete design process.
 
@@ -26,7 +26,7 @@ and the efficiency from the user perspective, as measured by the distribution of
 efficiency is desired, but in reality there is likely a trade-off between the two to some extent, even though they will be strongly positively correlated. It has been decided to
 prioritise minimising the user journey times when there is a conflict between the two measures of efficiency.
 
-### Intial considerations and assumptions
+### Initial considerations and assumptions
 - For most times of the day journeys to and from a given floor are equally likely relative to all other floors.
 - At times when most people are arriving to work (8am), pretty much all lift journeys will be from the ground floor to the upper floors,
   and vice versa at the end of the work day (6pm).
@@ -180,5 +180,27 @@ The code will need to contain a main loop, that starts when the lift stops at a 
 14. If lift is full, call the major function to calulate the opitmal route path, when not stopping at called floors.
 15. If lift is not full, calculate the optimal path using both selected and called floors.
 16. Using the optimal path P, move the lift to the next floor in accordance with P. Once arrived, the current floor is updated and the loop restarts at 1.
+
+## Current implementation of the algorithm prototype program
+The current console application implements most of the algorithm as described in the design section. It additionally tests the algorithms performance by simulating the lifts operating
+environment. It takes an input CSV file, obtained using a user prompt to input a valid file path.The format of this CSV file should match that found
+in [lift_calls_input_csv.csv](lift_calls_input_csv.csv). The file provides simulated lift calls occuring at different times from different floors, from labelled callers, and with their
+specified destination floors. The program also asks the user to provide a valid file directory, where the program creates a output CSV file containing the journey details of the lift
+callers, as well as the lift itself, as recorded on a stop-by-stop basis. The content of the output CSV file gives an indication of how the algorithm behaves, as well as its performance.
+
+A timer is started once the lift becomes operational, and when the calling time for a lift call in the input CSV file occurs, the call occurs in the program by updating the set of
+called floors. The program also simulates the time taken to travel between stops, as well as the average time for a stop. The user is also given the option of a Quick mode whereby the
+timers are sped up, as oppose to running in real-time; this will allow the user to observe the behaviour of the lift and performance of the algorithm faster. Various status updates
+and other information regarding the algorithms performance and the lift behaviour are periodically output to the terminal. They allow the user to visualise the lifts response to handling
+lift calls and users selecting destination floors. For example at every stop the time at which lift riders depart the lift, and lift callers board the lift is printed to the terminal.
+Furthermore the floors users call from, as well as the floors each user selects to travel to, are printed to the console.
+
+Some lift behaviours not implemented in the current prototype, include the lift weight load at each stop. There are also some small practical changes made to the algorithm design.
+A major one being that when the number of floors in candidate optimal paths is greater than 5, only paths involving 5 floors --- chosen out of all the actual floors that
+would normally feature in a path --- are present in the candidate optimal paths. This is because of the calculation time needed to calculate all possible paths, of which there are n!.
+Therefore when n > 5, all permutations of all combinations of 5 floors are used, and this corresponds to a subset of all possible paths. This will in some cases lead to a suboptimal
+path being chosen, but this cannot be avoided.
+
+
 
 
