@@ -9,6 +9,7 @@
 
   <ItemGroup>
     <PackageReference Include="morelinq" Version="3.4.2" />
+    <PackageReference Include="Pandoc.Windows" Version="2.1.0" />
     <PackageReference Include="SFERA.Math.Combinatorics" Version="2.2021.1" />
   </ItemGroup>
 
