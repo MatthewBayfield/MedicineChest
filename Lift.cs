@@ -169,6 +169,8 @@ namespace MedicineChest
                         Task task = Task.Delay(liftAdjacentFloorTravelTime * 1000 * Math.Abs(currentFloor - nextFloorStop));
                         task.Wait();
                     }
+                    // Updating lift journey details.
+                    Program.UpdateLiftJourneyDetails(currentFloor, timeWhenStopped, liftRiders, liftCallers, optimalPath);
                     // Changing the current stop to the next stop to indicate the lift has arrived at the next stop.
                     currentFloor = nextFloorStop;
                     Console.WriteLine("Lift stopped at current floor = {0}, at t = {1}.", currentFloor, Program.time);
@@ -201,6 +203,8 @@ namespace MedicineChest
                         Task task = Task.Delay(liftAdjacentFloorTravelTime * 1000 * Math.Abs(currentFloor - nextFloorStop));
                         task.Wait();
                     }
+                    // Updating lift journey details.
+                    Program.UpdateLiftJourneyDetails(currentFloor, timeWhenStopped, liftRiders, liftCallers, optimalPath);
                     // Changing the current stop to the next stop to indicate the lift has arrived at the next stop.
                     currentFloor = nextFloorStop;
                     Console.WriteLine("Lift stopped at current floor = {0}, at t = {1}.", currentFloor, Program.time);
@@ -245,6 +249,8 @@ namespace MedicineChest
                 liftRiders.Add(boardedCallerID);
                 selectedFloor = Program.liftCallsDict[boardedCallerID][1];
                 selectedFloorsLive.Add(selectedFloor);
+                // Updating the journey details of the boarding rider
+                Program.UpdateCallerJourneyDetails(callerIDs: new List<int>(new int[]{ boardedCallerID }), timeboarded: timeWhenStopped);
                 Console.WriteLine("CallerID = {0} has boarded the lift at t = {1}, and selected to go to floor {2}", boardedCallerID, timeWhenStopped, selectedFloor);
                 liftCallers.Remove(boardedCallerID);
                 i++;
