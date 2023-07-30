@@ -1,4 +1,5 @@
-﻿using System.Timers;
+﻿using System.ComponentModel;
+using System.Timers;
 
 namespace MedicineChest
 {
@@ -39,6 +40,7 @@ namespace MedicineChest
             Task liftTask = new Task(lift.OperateLift);
             liftTask.Start();
             liftTask.Wait();
+            WriteToOutputCSV();
         }
 
         public static void UpdateTime(Object? sender, ElapsedEventArgs e)
@@ -61,7 +63,7 @@ namespace MedicineChest
             if (time > LastCallTime & lift.selectedFloorsLive.Count == 0 & lift.calledFloorsLive.Count == 0)
             {
                 timer.Stop();
-                Console.WriteLine("Lift is now empty, no more calls exist.");
+                Console.WriteLine("Lift is now empty, no more calls exist, t = {0}", time);
                 terminate = true;
                 // add code here for writing total time to CSV
             }
@@ -289,6 +291,91 @@ namespace MedicineChest
 
         public static void WriteToOutputCSV()
         {
+            // Adding record headings:
+
+            List<string> outputCSVHeadings = new(InputCSVHeadings);
+            outputCSVHeadings.AddRange(new string[] {"Time when boarded", "Time when disembarked" , "Waiting time", "Journey time", "Total time"});
+            outputCSVHeadings[1] = "Calling floor";
+            outputCSVHeadings[3] = "Time when called";
+            // Adding lift journey details headings
+            outputCSVHeadings.AddRange(new string[] {"", "Time when stopped", "Lift current floor", "Lift riders after stop", "Lift callers after stop", "Route starting with current stop" });
+            string outputHeadings = string.Join(",", outputCSVHeadings);
+
+            // Adding data records:
+
+            List<string> outputCSVDataPartOne = new();
+            List<string> outputCSVDataPartTwo = new();
+            List<string> outputCSVDataTotal = new();
+
+            // Adding caller journey details records
+            foreach (KeyValuePair<int, List<int>> entry in liftCallsDict)
+            {
+                List<int> record = new();
+                record.AddRange(new int[] { entry.Key, entry.Value[0], entry.Value[1], entry.Value[2], CallerJourneyDetails[entry.Key][0], CallerJourneyDetails[entry.Key][1] });
+                // Adding value for waiting time.
+                record.Add(CallerJourneyDetails[entry.Key][0] - entry.Value[2]);
+                // Adding value for journey time
+                record.Add(CallerJourneyDetails[entry.Key][1] - CallerJourneyDetails[entry.Key][0]);
+                // Adding value for total time = journey time + waiting time.
+                record.Add(record[record.Count - 1] + record[record.Count - 2]);
+                outputCSVDataPartOne.Add(string.Join(",", record));
+            }
+
+            // Adding lift journey details records
+            for (int i = 0; i < LiftJourneyDetails.Count; ++i)
+            {
+                List<string> record = new();
+                record.AddRange(LiftJourneyDetails[i]);
+                outputCSVDataPartTwo.Add(string.Join(",", record));
+            }
+
+
+            List<string> biggerList;
+            List<string> smallerList;
+            if (outputCSVDataPartOne.Count >= outputCSVDataPartTwo.Count)
+            {
+                biggerList = outputCSVDataPartOne;
+                smallerList = outputCSVDataPartTwo;
+            }
+            else
+            {
+                biggerList = outputCSVDataPartTwo;
+                smallerList = outputCSVDataPartOne;
+            }
+            for (int i = 0; i < smallerList.Count; ++i)
+            {
+                outputCSVDataTotal.Add(outputCSVDataPartOne[i] + ",," + outputCSVDataPartTwo[i]);
+            }
+            if (biggerList == outputCSVDataPartOne)
+            {
+                for (int i = smallerList.Count; i < biggerList.Count; ++i)
+                {
+                    outputCSVDataTotal.Add(outputCSVDataPartOne[i]);
+                }
+            }
+            else
+            {
+                for (int i = smallerList.Count; i < biggerList.Count; ++i)
+                {
+                    outputCSVDataTotal.Insert(i, ",,,," + outputCSVDataPartTwo[i]);
+                }
+            }
+            
+
+
+            try
+            {
+                outputCSVDataTotal.Insert(0, outputHeadings);
+                File.AppendAllLines(OutputCSVFilePath, outputCSVDataTotal);
+            }
+
+            catch (Exception e)
+            {
+                Console.Write("Unable to write caller journey details to output CSV file.");
+                Console.WriteLine(e.Message);
+            }
+            
+        }
 
         private static string ConvertListToPrintableRepresentation(List<int> list)
         {
