@@ -201,6 +201,35 @@ would normally feature in a path --- are present in the candidate optimal paths.
 Therefore when n > 5, all permutations of all combinations of 5 floors are used, and this corresponds to a subset of all possible paths. This will in some cases lead to a suboptimal
 path being chosen, but this cannot be avoided.
 
+## Testing
+Testing can be partitioned in to two types: the functionality/behaviour testing of the program and the performance testing of the algorithm.
+
+### Program testing
+
+#### Manual testing
+So far informal manual testing has been performed on the program by observing the outputs in the console and also the targeted use of console writeline statements.
+The use of an example input CSV file has also aided in checking the expected behaviour of the program. Most formal testing
+will be conducted using automated unit and integration tests.
+
+#### Automated testing
+Automated tests are currently being written with the aim of providing complete code coverage. This section will be updated as and when tests are written.
+
+### Performance testing of the algorithm
+The performance of the algorithm has been assessed by observing the information output to the console, as well as the output CSV file. Collectively these outputs indicate the efficiency
+of the lift as measured by the total user journey time, as well as the total lift operation time. From the outputs it is clear the algorithm in its current prototype form is not
+nearly as efficient as desired, with many users having too long journey times, and a few users having extremely long journey times. The cause of these performance issues, on inspection,
+appears to be caused by the algorithms behaviour when full or being close to full, and when deciding when to visit called floors. Specifically often when the lift is attending called
+floors, and is almost full, not all callers are able to board, leading to multiple trips to the same called floors being needed. This then creates a snowball effect where some called floors
+exceed the threshold limit, and so when the lift is not full, these are prioritised. Unfortunately if the lift is still close to full, even after only stopping at selected floors ---
+which happens because as many people board as depart at a selected stop --- then even though the lift travels to these threshold exceeded called floors, not all callers can board;
+and then the called floor must once again be visited.
+
+## Future improvements
+To improve the algorithm, its behaviour needs to be altered in the scenario where the lift is close to full, and there are many called floors awaiting the lift. One possible idea is
+to only visit threshold exceeded called floors when the lift is at least half empty, so that more people can board than there are currently on the lift. This idea and others will be
+trialed shortly and the algorithm performance reassessed.
+
+
 
 
 
