@@ -11,7 +11,7 @@ namespace MedicineChest
         public static string[] InputCSVHeadings = {};
         public static List<List<int>> liftCallsList = new();
         public static Dictionary<int, List<int>> liftCallsDict = new();
-        private static Lift lift = new();
+        private static LiftV1 lift = new();
         private static Dictionary<int, List<int>> CallerJourneyDetails = new();
         private static List<List<string>> LiftJourneyDetails = new();
         private static string? OutputCSVFilePath;

@@ -1,9 +1,12 @@
-﻿using SFERA.Math.Combinatorics;
+﻿
+using SFERA.Math.Combinatorics;
+
+using SFERA.Math.Combinatorics;
 using MoreLinq;
 
 namespace MedicineChest
 {
-    internal class Lift
+    internal abstract class LiftBase
     {
         public Dictionary<string, int> selectedFloorCounters = new();
         public Dictionary<string, int> calledFloorCounters = new();
@@ -22,7 +25,7 @@ namespace MedicineChest
         public int numberOfStopsThreshold = 9;
         public int numberOfFloors = 10;
 
-        public Lift()
+        public LiftBase()
         {
             foreach (int i in Enumerable.Range(1, 10))
             {
@@ -35,6 +38,8 @@ namespace MedicineChest
             }
         }
 
+        public abstract void OperateLift();
+
         public void UpdateCalledFloors(List<int> callerIDs)
         {
             foreach (int call in callerIDs)
@@ -46,173 +51,7 @@ namespace MedicineChest
             }
         }
 
-        public void OperateLift()
-        {
-            int timeWhenStopped = 0;
-            int spacesAvailable = liftCapacity;
-            // Main Lift Operation Loop.
-            Console.WriteLine("Lift at floor = {0}, at t = {1}.", currentFloor, timeWhenStopped);
-            while (!Program.terminate)
-            {
-                timeWhenStopped = Program.time;
-
-                // Behaviour when lift is empty and no lift calls:
-
-                // Corresponds to the lift being empty
-                if (selectedFloorsLive.Count == 0 & calledFloorsLive.Count == 0)
-                {
-                    // return if necessary to floor 5
-                    currentFloor = 5;
-                    continue;
-                }
-
-                // Behaviour when lift is not empty and or there are lift calls:
-                if (selectedFloorsLive.Contains(currentFloor) | calledFloorsLive.Contains(currentFloor))
-                {
-                    Console.WriteLine("Opening lift doors.");
-                    Console.WriteLine("Waiting average stop time = {0}", averageStopTime);
-                    // Removing current floor from the selected floor sets.
-                    selectedFloorsLive.Remove(currentFloor);
-                    selectedFloorsSnapshot.Remove(currentFloor);
-                    // Resetting counter for current floor in selectedFloorCounters.
-                    selectedFloorCounters[$"x_{currentFloor}"] = 0;
-                    // Disembarking any relevant riders at current stop.
-                    DisembarkRiders(timeWhenStopped);
-
-                    spacesAvailable = liftCapacity - liftRiders.Count;
-                    // In this prototype test it is possible to track the number of users in the lift, and this will be used instead of changes in the lift weight.
-                    if (liftRiders.Count == liftCapacity)
-                    {
-                        liftFull = true;
-                        Console.WriteLine("Lift is now full.");
-                    }
-
-                    else if (CanAllCallersBoard(spacesAvailable))
-                    {
-                        liftFull = true;
-                        Console.WriteLine("Lift is now full.");
-                    }
-                    else
-                    {
-                        liftFull = false;
-                        // Removing current floor from the called floor sets.
-                        calledFloorsLive.Remove(currentFloor);
-                        calledFloorsSnapshot.Remove(currentFloor);
-                        // Resetting counter for current floor in calledFloorCounters.
-                        calledFloorCounters[$"y_{currentFloor}"] = 0;
-                    }
-
-                    // Add selected floors for any new riders that boarded.
-                    SelectFloors(spacesAvailable, timeWhenStopped);
-                    Console.WriteLine("Floors in selectedFloorsLive:");
-                    selectedFloorsLive.ForEach(Console.WriteLine);
-                    // Updating counters for remaining selected and called floors
-                    foreach (int floor in selectedFloorsSnapshot)
-                    {
-                        selectedFloorCounters[$"x_{floor}"] += 1;
-                    }
-                    foreach (int floor in calledFloorsSnapshot)
-                    {
-                        calledFloorCounters[$"y_{floor}"] += 1;
-                    }
-
-                    Console.WriteLine("selectedFloorCounters:");
-                    foreach (KeyValuePair<string, int> pair in selectedFloorCounters)
-                    {
-                        Console.WriteLine("{0} = {1}", pair.Key, pair.Value);
-                    }
-                    Console.WriteLine("calledFloorCounters:");
-                    foreach (KeyValuePair<string, int> pair in calledFloorCounters)
-                    {
-                        Console.WriteLine("{0} = {1}", pair.Key, pair.Value);
-                    }
-
-                    Console.WriteLine("Closing lift doors."); 
-
-                    // Updating selected and called floor snapshots.
-                    UpdateSnapshots();
-                    // Check if lift is empty after updates.
-                    if (selectedFloorsSnapshot.Count == 0 & calledFloorsSnapshot.Count == 0)
-                    {
-                        continue;
-                    }
-
-                    // Determining the optimal path for the lift after current stop:
-
-                    List<int> optimalPath = new();
-                    Task calculationTask = Task.Run(() => optimalPath = CalculateOptimalPath());
-                    // Simulating the average stop time
-                    if (Program.QuickMode)
-                    {
-                        Task[] taskArray = new Task[] { calculationTask, Task.Delay(averageStopTime * 100) };
-                        var taskGroup = Task.WhenAll(taskArray);
-                        taskGroup.Wait();
-                    }
-                    else
-                    {
-                        Task[] taskArray = new Task[] { calculationTask, Task.Delay(averageStopTime * 1000) };
-                        var taskGroup = Task.WhenAll(taskArray);
-                        taskGroup.Wait();
-                    }
-                    Console.WriteLine("Order of floors in the optimal path:");
-                    optimalPath.ForEach(Console.WriteLine);
-                    int nextFloorStop = optimalPath[1];
-                    // Simulating time taken to travel to next floor stop.
-                    Console.WriteLine("Lift moving to floor = {0}.", nextFloorStop);
-                    if (Program.QuickMode)
-                    {
-                        Task task = Task.Delay(liftAdjacentFloorTravelTime * 100 * Math.Abs(currentFloor - nextFloorStop));
-                        task.Wait();
-                    }
-                    else
-                    {
-                        Task task = Task.Delay(liftAdjacentFloorTravelTime * 1000 * Math.Abs(currentFloor - nextFloorStop));
-                        task.Wait();
-                    }
-                    // Updating lift journey details.
-                    Program.UpdateLiftJourneyDetails(currentFloor, timeWhenStopped, liftRiders, liftCallers, optimalPath);
-                    // Changing the current stop to the next stop to indicate the lift has arrived at the next stop.
-                    currentFloor = nextFloorStop;
-                    Console.WriteLine("Lift stopped at current floor = {0}, at t = {1}.", currentFloor, Program.time);
-                }
-                else
-                {
-                    // Updating selected and called floor snapshots.
-                    UpdateSnapshots();
-                    // Check if lift is empty after updates.
-                    if (selectedFloorsSnapshot.Count == 0 & calledFloorsSnapshot.Count == 0)
-                    {
-                        continue;
-                    }
-
-                    // Determining the optimal path for the lift after current stop:
-
-                    List<int> optimalPath = CalculateOptimalPath();
-                    Console.WriteLine("Order of floors in the optimal path:");
-                    optimalPath.ForEach(Console.WriteLine);
-                    int nextFloorStop = optimalPath[1];
-                    // Simulating time taken to travel to next floor stop.
-                    Console.WriteLine("Lift moving to floor = {0}.", nextFloorStop);
-                    if (Program.QuickMode)
-                    {
-                        Task task = Task.Delay(liftAdjacentFloorTravelTime * 100 * Math.Abs(currentFloor - nextFloorStop));
-                        task.Wait();
-                    }
-                    else
-                    {
-                        Task task = Task.Delay(liftAdjacentFloorTravelTime * 1000 * Math.Abs(currentFloor - nextFloorStop));
-                        task.Wait();
-                    }
-                    // Updating lift journey details.
-                    Program.UpdateLiftJourneyDetails(currentFloor, timeWhenStopped, liftRiders, liftCallers, optimalPath);
-                    // Changing the current stop to the next stop to indicate the lift has arrived at the next stop.
-                    currentFloor = nextFloorStop;
-                    Console.WriteLine("Lift stopped at current floor = {0}, at t = {1}.", currentFloor, Program.time);
-                }
-            }
-        }
-
-        private void DisembarkRiders(int timeWhenStopped)
+        protected void DisembarkRiders(int timeWhenStopped)
         {
             // Extracting departing riders
             IEnumerable<int> departingRiders =
@@ -228,7 +67,7 @@ namespace MedicineChest
             liftRiders.RemoveWhere((int riderID) => Program.liftCallsDict[riderID][1] == currentFloor);
         }
 
-        private void SelectFloors(int spacesAvailable, int timeWhenStopped)
+        protected void SelectFloors(int spacesAvailable, int timeWhenStopped)
         {
             if (spacesAvailable == 0) return;
             // Obtaining the ID's of callers wanting to board the lift.
@@ -250,15 +89,14 @@ namespace MedicineChest
                 selectedFloor = Program.liftCallsDict[boardedCallerID][1];
                 selectedFloorsLive.Add(selectedFloor);
                 // Updating the journey details of the boarding rider
-                Program.UpdateCallerJourneyDetails(callerIDs: new List<int>(new int[]{ boardedCallerID }), timeboarded: timeWhenStopped);
+                Program.UpdateCallerJourneyDetails(callerIDs: new List<int>(new int[] { boardedCallerID }), timeboarded: timeWhenStopped);
                 Console.WriteLine("CallerID = {0} has boarded the lift at t = {1}, and selected to go to floor {2}", boardedCallerID, timeWhenStopped, selectedFloor);
                 liftCallers.Remove(boardedCallerID);
                 i++;
             }
         }
 
-
-        private bool CanAllCallersBoard(int spacesAvailable)
+        protected bool CanAllCallersBoard(int spacesAvailable)
         {
             // Getting the list of callers wanting to board the lift.
             IEnumerable<int> boardingCallers =
@@ -280,7 +118,7 @@ namespace MedicineChest
             calledFloorsSnapshot.ForEach(Console.WriteLine);
         }
 
-        private List<int> CalculateOptimalPath()
+        protected List<int> CalculateOptimalPath()
         {
             // Creating sets to store which floors have exceeded the stops since visited threshold.
             HashSet<int> thresholdExceededSelectedFloors = new();
@@ -387,7 +225,7 @@ namespace MedicineChest
             return emptyPath;
         }
 
-        private List<int> RouteOptimiser(HashSet<int> floorSet)
+        protected List<int> RouteOptimiser(HashSet<int> floorSet)
         {
             int numberOfStopsInPath = floorSet.Count;
             List<int> floorList = floorSet.ToList();
@@ -468,7 +306,7 @@ namespace MedicineChest
             return labelledAllPossiblePaths[indexedMinimumTimes.ToList()[0].Key];
         }
 
-        private int CalculateJthPartialSumQ_j(int j, List<int> floors)
+        protected int CalculateJthPartialSumQ_j(int j, List<int> floors)
         {
             // Calculation of Q_j found in expression T(P).
 
@@ -483,7 +321,7 @@ namespace MedicineChest
             return Q_j;
         }
 
-        private int eta_j(int floor)
+        protected int eta_j(int floor)
         {
             // Calculation of eta_j found in expression T(P).
 
@@ -497,7 +335,7 @@ namespace MedicineChest
             }
         }
 
-        private int SumPartialSumsForPath(List<int> floors)
+        protected int SumPartialSumsForPath(List<int> floors)
         {
             List<int> partialSumTerms = new();
             int j = 1;
@@ -532,7 +370,7 @@ namespace MedicineChest
             }
         }
 
-        private List<int> IncorporateCalledFloors(List<int> pathForSelectedFloors, List<int> calledFloors)
+        protected List<int> IncorporateCalledFloors(List<int> pathForSelectedFloors, List<int> calledFloors)
         {
             // Path for only the selected floors.
             pathForSelectedFloors = new(pathForSelectedFloors);
