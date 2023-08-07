@@ -118,7 +118,7 @@ namespace MedicineChest
             calledFloorsSnapshot.ForEach(Console.WriteLine);
         }
 
-        protected List<int> CalculateOptimalPath()
+        virtual protected List<int> CalculateOptimalPath()
         {
             // Creating sets to store which floors have exceeded the stops since visited threshold.
             HashSet<int> thresholdExceededSelectedFloors = new();
@@ -225,7 +225,7 @@ namespace MedicineChest
             return emptyPath;
         }
 
-        protected List<int> RouteOptimiser(HashSet<int> floorSet)
+        protected virtual List<int> RouteOptimiser(HashSet<int> floorSet)
         {
             int numberOfStopsInPath = floorSet.Count;
             List<int> floorList = floorSet.ToList();
@@ -370,7 +370,7 @@ namespace MedicineChest
             }
         }
 
-        protected List<int> IncorporateCalledFloors(List<int> pathForSelectedFloors, List<int> calledFloors)
+        protected  virtual List<int> IncorporateCalledFloors(List<int> pathForSelectedFloors, List<int> calledFloors)
         {
             // Path for only the selected floors.
             pathForSelectedFloors = new(pathForSelectedFloors);
