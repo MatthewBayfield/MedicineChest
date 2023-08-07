@@ -375,7 +375,7 @@ namespace MedicineChest
             }
         }
 
-        private static string ConvertListToPrintableRepresentation(List<int> list)
+        public static string ConvertListToPrintableRepresentation(List<int> list)
         {
             string stringForm = "\"(";
             for (int i = 0; i < list.Count; ++i)
