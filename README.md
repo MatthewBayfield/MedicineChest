@@ -15,7 +15,7 @@ They have high expectations for the lift with a strong desire for efficiency. To
 - The lift will have a maximum capacity of 8 people.
 
 ## Algorithm Design
-**For a complete and full thorough discussion of the algorithm design please see [lift_algorithm_design.pdf](lift_algorithm_design.pdf)** 
+**For a complete and full thorough discussion of the algorithm design please see [lift_algorithm_design.pdf](docs/lift_algorithm_design.pdf)** 
 
 What follows is a summary or outline of the complete design process.
 
@@ -184,7 +184,7 @@ The code will need to contain a main loop, that starts when the lift stops at a 
 ## Current implementation of the algorithm prototype program
 The current console application implements most of the algorithm as described in the design section. It additionally tests the algorithms performance by simulating the lifts operating
 environment. It takes an input CSV file, obtained using a user prompt to input a valid file path.The format of this CSV file should match that found
-in [lift_calls_input_csv.csv](lift_calls_input_csv.csv). The file provides simulated lift calls occuring at different times from different floors, from labelled callers, and with their
+in [lift_calls_input_data.csv](resources/lift_calls_input_data.csv). The file provides simulated lift calls occuring at different times from different floors, from labelled callers, and with their
 specified destination floors. The program also asks the user to provide a valid file directory, where the program creates a output CSV file containing the journey details of the lift
 callers, as well as the lift itself, as recorded on a stop-by-stop basis. The content of the output CSV file gives an indication of how the algorithm behaves, as well as its performance.
 
