@@ -1,9 +1,9 @@
 ﻿
 using SFERA.Math.Combinatorics;
-
-using SFERA.Math.Combinatorics;
 using MoreLinq;
+using System.Runtime.CompilerServices;
 
+[assembly: InternalsVisibleTo("MedicineChest.Tests")]
 namespace MedicineChest
 {
     internal abstract class LiftBase
