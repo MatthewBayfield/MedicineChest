@@ -3,7 +3,7 @@ namespace MedicineChest.Tests
     using Xunit;
     public class LiftBaseTests
     {
-        // class created to test inherited constructor 
+        // Derived class created to get a class instance that derives from LiftBase, as well as to be able to access protected methods.
         internal class Lift : LiftBase
         {
             override public void OperateLift()
@@ -11,11 +11,26 @@ namespace MedicineChest.Tests
             }
         }
 
+        private Lift lift = new();
+
+        public LiftBaseTests() 
+        {
+            // External Program static variable reinitialisations
+            Program.terminate = false;
+            Program.liftCallsList.Clear();
+            Program.liftCallsDict.Clear();
+            Program.QuickMode = false;
+            // Initial assignments
+            Program.liftCallsDict.Add(1, new List<int>(new int[] { 2, 1, 5 }));
+            Program.liftCallsDict.Add(2, new List<int>(new int[] { 1, 9, 17 }));
+            Program.liftCallsDict.Add(3, new List<int>(new int[] { 10, 5, 32 }));
+        }        
+
         [Fact]
         public void LiftBase_PopulatesFloorCounterDicts()
         {
             // Act
-            Lift lift = new();
+            // Lift instance creation
 
             // Assert
             Assert.Equal(10, lift.selectedFloorCounters.Count);
@@ -42,11 +57,7 @@ namespace MedicineChest.Tests
 
             using (StringWriter consoleOutput = new())
             {
-                // Arrange
-                Lift lift = new();
-                Program.liftCallsDict.Add(1, new List<int>(new int[] { 2, 1, 5 }));
-                Program.liftCallsDict.Add(2, new List<int>(new int[] { 1, 9, 17 }));
-                Program.liftCallsDict.Add(3, new List<int>(new int[] { 10, 5, 32 }));
+                // Arrange               
                 Console.SetOut(consoleOutput);
 
                 // Act
@@ -59,12 +70,11 @@ namespace MedicineChest.Tests
                 Assert.Contains(10, lift.calledFloorsLive);
                 using (StringReader reader = new(consoleOutput.ToString()))
                 {
-
                     Assert.Equal($"Lift called from floor 2 at t = 5, by callerID = {ID1}", reader.ReadLine());
                     Assert.Equal($"Lift called from floor 1 at t = 17, by callerID = {ID2}", reader.ReadLine());
                     Assert.Equal($"Lift called from floor 10 at t = 32, by callerID = {ID3}", reader.ReadLine());
                 }
             }
-        }
+        }   
     }
 }
