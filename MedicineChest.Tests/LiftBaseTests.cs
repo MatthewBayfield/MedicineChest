@@ -1,5 +1,6 @@
 namespace MedicineChest.Tests
 {
+    using Moq;
     using Xunit;
     public class LiftBaseTests
     {
@@ -8,6 +9,11 @@ namespace MedicineChest.Tests
         {
             override public void OperateLift()
             {
+            }
+
+            internal void DisembarkRidersWrapper(int timeWhenStopped)
+            {
+                base.DisembarkRiders(timeWhenStopped);
             }
         }
 
@@ -75,6 +81,38 @@ namespace MedicineChest.Tests
                     Assert.Equal($"Lift called from floor 10 at t = 32, by callerID = {ID3}", reader.ReadLine());
                 }
             }
-        }   
+        }
+
+        [Theory]
+        [InlineData(50, 7)]
+        public void DisembarkRiders_AtCurrentFloorAndTime_RemovesRidersFromList(int timeWhenStopped, int currentFloor)
+        {
+            using (StringWriter consoleOutput = new())
+            {
+                // Arrange
+                Program.liftCallsDict.Add(4, new List<int>(new int[] { 3, currentFloor, 25 }));
+                Program.liftCallsDict.Add(5, new List<int>(new int[] { 5, currentFloor, 40 }));
+                lift.liftRiders.Add(1);
+                lift.liftRiders.Add(2);
+                lift.liftRiders.Add(3);
+                lift.liftRiders.Add(4);
+                lift.liftRiders.Add(5);
+                lift.currentFloor = currentFloor;
+                Console.SetOut(consoleOutput);
+
+                // Act
+                lift.DisembarkRidersWrapper(timeWhenStopped);
+
+                // Assert
+                Assert.Equal(3, lift.liftRiders.Count);
+                Assert.DoesNotContain(4, lift.liftRiders);
+                Assert.DoesNotContain(5, lift.liftRiders);
+                using (StringReader reader = new(consoleOutput.ToString()))
+                {
+                    Assert.Equal($"Rider with callerID = 4, departing at current floor = {currentFloor}, at t = {timeWhenStopped}", reader.ReadLine());
+                    Assert.Equal($"Rider with callerID = 5, departing at current floor = {currentFloor}, at t = {timeWhenStopped}", reader.ReadLine());
+                }
+            }
+        }        
     }
 }
